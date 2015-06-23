@@ -1,0 +1,156 @@
+.resizer {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px dashed gray;
+  background-color: transparent;
+  cursor: move;
+}
+
+.resizer .resize-handle {
+  position: absolute;
+  background-color: #333;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+  font-size: 1px;
+  height: 7px;
+  width: 7px;
+}
+
+.resizer .resize-handle.ord-n {
+  cursor: n-resize;
+  left: 50%;
+  margin-left: -4px;
+  margin-top: -1px;
+  top: 0;
+}
+
+.resizer .resize-handle.ord-s {
+  cursor: s-resize;
+  bottom: 0;
+  left: 50%;
+  margin-bottom: -1px;
+  margin-left: -4px;
+}
+
+.resizer .resize-handle.ord-e {
+  cursor: e-resize;
+  margin-right: -1px;
+  margin-top: -4px;
+  right: 0;
+  top: 50%;
+}
+
+.resizer .resize-handle.ord-w {
+  cursor: w-resize;
+  left: 0;
+  margin-left: -1px;
+  margin-top: -4px;
+  top: 50%;
+}
+
+.resizer .resize-handle.ord-nw {
+  cursor: nw-resize;
+  left: 0;
+  margin-left: -1px;
+  margin-top: -1px;
+  top: 0;
+}
+
+.resizer .resize-handle.ord-ne {
+  cursor: ne-resize;
+  margin-right: -1px;
+  margin-top: -1px;
+  right: 0;
+  top: 0;
+}
+
+.resizer .resize-handle.ord-se {
+  cursor: se-resize;
+  bottom: 0;
+  margin-bottom: -1px;
+  margin-right: -1px;
+  right: 0;
+}
+
+.resizer .resize-handle.ord-sw {
+  cursor: sw-resize;
+  bottom: 0;
+  left: 0;
+  margin-bottom: -1px;
+  margin-left: -1px;
+}
+
+.resizer .resize-bar.ord-n, .resizer .resize-bar.ord-s {
+  position: absolute;
+  height: 7px;
+  width: 100%;
+}
+
+.resizer .resize-bar.ord-e, .resizer .resize-bar.ord-w {
+  position: absolute;
+  height: 100%;
+  width: 7px;
+}
+
+.resizer .resize-bar.ord-n {
+  cursor: n-resize;
+  margin-top: -1px;
+}
+
+.resizer .resize-bar.ord-s {
+  cursor: s-resize;
+  bottom: 0;
+  margin-bottom: -1px;
+}
+
+.resizer .resize-bar.ord-e {
+  cursor: e-resize;
+  margin-right: -1px;
+  right: 0;
+}
+
+.resizer .resize-bar.ord-w {
+  cursor: w-resize;
+  margin-left: -1px;
+}
+
+.resizer .inner-rect {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  opacity: 0;
+  filter: alpha(opacity=0);
+}
+
+.cropper {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.cropper .mask {
+  width: 100%;
+  height: 100%;
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+  display: block;
+  background-color: black;
+}
+
+.cropper .resizer .wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  overflow: hidden;
+}
+
+.cropper .resizer .wrapper img {
+  position: absolute;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
