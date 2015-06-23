@@ -1,0 +1,13 @@
+{
+  "name": "image-cropper",
+  "main": "dist/cropper.js",
+  "version": "0.1.0",
+  "authors": [
+    "Furybean <long.zhang@ele.me>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "demo",
+    "test"
+  ]
+}

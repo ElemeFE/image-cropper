@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "browserify": "^9.0.8"
+  }
+}
