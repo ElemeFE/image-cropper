@@ -69,8 +69,12 @@ Cropper.prototype.resetResizer = function() {
   resizerDom.style.width = '100px';
   resizerDom.style.height = '100px';
 
-  resizerDom.style.left = (cropperRect.width - 100) / 2 + 'px';
-  resizerDom.style.top = (cropperRect.height - 100) / 2 + 'px';
+  if (cropperRect) {
+    resizerDom.style.left = (cropperRect.width - 100) / 2 + 'px';
+    resizerDom.style.top = (cropperRect.height - 100) / 2 + 'px';
+  } else {
+    resizerDom.style.left = resizerDom.style.top = '';
+  }
 
   resizer.doOnStateChange();
   resizer.doOnDragEnd();
@@ -82,6 +86,32 @@ Cropper.prototype.setImage = function(src) {
   var resizeImage = this.refs.image;
 
   var self = this;
+
+  if (src === undefined || src === null) {
+    resizeImage.src = sourceImage.src = blankImage;
+    resizeImage.style.width = resizeImage.style.height = resizeImage.style.left = resizeImage.style.top = '';
+    sourceImage.style.width = sourceImage.style.height = sourceImage.style.left = sourceImage.style.top = '';
+
+    self.updatePreview(blankImage);
+
+    self.dom.style.display = 'none';
+    self.resetResizer();
+
+    self.dom.style.left = self.dom.style.top = '';
+    self.dom.style.width = element.offsetWidth + 'px';
+    self.dom.style.height = element.offsetHeight + 'px';
+
+    self.croppedRect = {
+      width: 0,
+      height: 0,
+      left: 0,
+      top: 0
+    };
+
+    self.onCroppedRectChange && self.onCroppedRectChange(self.croppedRect);
+
+    return;
+  }
 
   getImageSize(src, function(size) {
     if (ieVersion < 10) {
@@ -128,10 +158,9 @@ Cropper.prototype.setImage = function(src) {
       resizeImage.src = src;
     }
 
-    if (self.resizer) {
-      self.resizer.dom.style.display = '';
-      self.resetResizer();
-    }
+    self.dom.style.display = '';
+    self.resetResizer();
+
     self.updatePreview(src);
   });
 };
@@ -192,16 +221,18 @@ Cropper.prototype.render = function(container) {
 
     var imageSize = self.imageSize;
     var cropperRect = self.cropperRect;
-    var scale = cropperRect.width / imageSize.width;
+    if (cropperRect) {
+      var scale = cropperRect.width / imageSize.width;
 
-    self.croppedRect = {
-      width: Math.floor(resizerWidth / scale),
-      height: Math.floor(resizerHeight / scale),
-      left: Math.floor(left / scale),
-      top: Math.floor(top / scale)
-    };
+      self.croppedRect = {
+        width: Math.floor(resizerWidth / scale),
+        height: Math.floor(resizerHeight / scale),
+        left: Math.floor(left / scale),
+        top: Math.floor(top / scale)
+      };
 
-    self.onCroppedRectChange && self.onCroppedRectChange(self.croppedRect);
+      self.onCroppedRectChange && self.onCroppedRectChange(self.croppedRect);
+    }
   };
   self.resizer = resizer;
   self.dom = dom;
@@ -210,7 +241,7 @@ Cropper.prototype.render = function(container) {
 
   container.appendChild(dom);
 
-  resizer.dom.style.display = 'none';
+  self.dom.style.display = 'none';
 };
 
 Cropper.prototype.updatePreview = function(src) {
@@ -229,24 +260,31 @@ Cropper.prototype.updatePreview = function(src) {
   for (var i = 0, j = previews.length; i < j; i++) {
     var item = previews[i];
     var itemImg = item.querySelector('img');
-    if (ieVersion < 10) {
-      if (src) {
-        itemImg.src = blankImage;
+    if (!itemImg) continue;
 
-        itemImg.style.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)';
-        itemImg.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = src;
-        itemImg.style.width = cropperRect.width + 'px';
-        itemImg.style.height = cropperRect.height + 'px';
+    if (src === blankImage) {
+      itemImg.style.width = itemImg.style.height = itemImg.style.left = itemImg.style.top = '';
+      itemImg.src = blankImage;
+    } else {
+      if (ieVersion < 10) {
+        if (src) {
+          itemImg.src = blankImage;
+
+          itemImg.style.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)';
+          itemImg.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = src;
+          itemImg.style.width = cropperRect.width + 'px';
+          itemImg.style.height = cropperRect.height + 'px';
+        }
+      } else if (src) {
+        itemImg.src = src;
       }
-    } else if (src) {
-      itemImg.src = src;
-    }
-    var scale = item.offsetWidth / resizerWidth;
+      var scale = item.offsetWidth / resizerWidth;
 
-    itemImg.style.width = scale * cropperRect.width + 'px';
-    itemImg.style.height = scale * cropperRect.height + 'px';
-    itemImg.style.left = -resizerLeft * scale + 'px';
-    itemImg.style.top = -resizerTop * scale + 'px';
+      itemImg.style.width = scale * cropperRect.width + 'px';
+      itemImg.style.height = scale * cropperRect.height + 'px';
+      itemImg.style.left = -resizerLeft * scale + 'px';
+      itemImg.style.top = -resizerTop * scale + 'px';
+    }
   }
 };
 

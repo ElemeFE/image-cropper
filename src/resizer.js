@@ -2,14 +2,14 @@ var buildDom = require('./build-dom');
 var draggable = require('./draggable');
 
 var configMap = {
-  "n":  { top: true, height: -1 },
-  "w":  { left: true, width: -1 },
-  "e":  { width: 1 },
-  "s":  { height: 1 },
-  "nw": { left: true, top: true, width: -1, height: -1 },
-  "ne": { top: true, width: 1, height: -1 },
-  "sw": { left: true, width: -1, height: 1 },
-  "se": { width: 1, height: 1 }
+  'n':  { top: true, height: -1 },
+  'w':  { left: true, width: -1 },
+  'e':  { width: 1 },
+  's':  { height: 1 },
+  'nw': { left: true, top: true, width: -1, height: -1 },
+  'ne': { top: true, width: 1, height: -1 },
+  'sw': { left: true, width: -1, height: 1 },
+  'se': { width: 1, height: 1 }
 };
 
 var getPosition = function (element) {
@@ -19,7 +19,7 @@ var getPosition = function (element) {
   return {
     left: selfRect.left - parentRect.left,
     top: selfRect.top - parentRect.top
-  }
+  };
 };
 
 var Resizer = function() {
@@ -99,7 +99,7 @@ Resizer.prototype.bindResizeEvent = function(dom) {
   var resizeState = {};
 
   var makeResizable = function (bar) {
-    var type = bar.className.split(" ")[0];
+    var type = bar.className.split(' ')[0];
     var transformMap = configMap[type.substr(4)];
 
     var containment;
@@ -162,9 +162,9 @@ Resizer.prototype.bindResizeEvent = function(dom) {
 
         if (aspectRatio !== undefined) {
           //width = height = Math.max(width, height);
-          if (type === "ord-n" || type === "ord-s") {
+          if (type === 'ord-n' || type === 'ord-s') {
             width = height * aspectRatio;
-          } else if (type === "ord-w" || type === "ord-e") {
+          } else if (type === 'ord-w' || type === 'ord-e') {
             height = width / aspectRatio;
           } else {
             if (width / height < aspectRatio) {
@@ -210,7 +210,7 @@ Resizer.prototype.bindResizeEvent = function(dom) {
 
         //=== containment end
 
-        if (aspectRatio != undefined) {
+        if (aspectRatio !== undefined) {
           if (width / height < aspectRatio) {
             height = width / aspectRatio;
           } else {
@@ -268,18 +268,18 @@ Resizer.prototype.render = function(container) {
     tag: 'div',
     className: 'resizer',
     content: [
-      { tag: "div", className: "ord-n resize-bar" },
-      { tag: "div", className: "ord-s resize-bar" },
-      { tag: "div", className: "ord-w resize-bar" },
-      { tag: "div", className: "ord-e resize-bar" },
-      { tag: "div", className: "ord-nw resize-handle" },
-      { tag: "div", className: "ord-n resize-handle" },
-      { tag: "div", className: "ord-ne resize-handle" },
-      { tag: "div", className: "ord-w resize-handle" },
-      { tag: "div", className: "ord-e resize-handle" },
-      { tag: "div", className: "ord-sw resize-handle" },
-      { tag: "div", className: "ord-s resize-handle" },
-      { tag: "div", className: "ord-se resize-handle" }
+      { tag: 'div', className: 'ord-n resize-bar' },
+      { tag: 'div', className: 'ord-s resize-bar' },
+      { tag: 'div', className: 'ord-w resize-bar' },
+      { tag: 'div', className: 'ord-e resize-bar' },
+      { tag: 'div', className: 'ord-nw resize-handle' },
+      { tag: 'div', className: 'ord-n resize-handle' },
+      { tag: 'div', className: 'ord-ne resize-handle' },
+      { tag: 'div', className: 'ord-w resize-handle' },
+      { tag: 'div', className: 'ord-e resize-handle' },
+      { tag: 'div', className: 'ord-sw resize-handle' },
+      { tag: 'div', className: 'ord-s resize-handle' },
+      { tag: 'div', className: 'ord-se resize-handle' }
     ]
   });
 

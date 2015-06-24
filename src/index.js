@@ -1,10 +1,17 @@
-var Resizer = require('./resizer');
 var Cropper = require('./cropper');
 
 if (typeof angular !== 'undefined') {
   var cropperInstances = {};
 
-  angular.module('cropper', []).directive('cropper', function() {
+  Cropper.getInstance = function(id) {
+    return cropperInstances[id];
+  };
+
+  angular.module('cropper', [])
+  .factory('Cropper', function() {
+    return Cropper;
+  })
+  .directive('cropper', function() {
     return {
       restrict: 'A',
       scope: {
@@ -26,7 +33,7 @@ if (typeof angular !== 'undefined') {
             cropperContext.width = rect.width;
             cropperContext.height = rect.height;
           }
-          scope.$apply();
+          try { scope.$apply(); } catch(e) {}
         };
 
         scope.$on('$destroy', function() {
@@ -60,6 +67,12 @@ if (typeof angular !== 'undefined') {
           var input = this;
           var cropper = cropperInstances[id];
 
+          var fileName = input.value;
+          if (!/\.(jpg|png|gif|jpeg)$/i.test(fileName)) {
+            cropper.setImage();
+            return;
+          }
+
           if (typeof FileReader !== 'undefined') {
             var reader = new FileReader();
             reader.onload = function (event) {
@@ -81,5 +94,8 @@ if (typeof angular !== 'undefined') {
   });
 }
 
-window.Resizer = Resizer;
-window.Cropper = Cropper;
+if (typeof module !== 'undefined') {
+  module.exports = Cropper;
+} else {
+  window.Cropper = Cropper;
+}
