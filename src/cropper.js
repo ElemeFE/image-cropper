@@ -73,6 +73,7 @@ Cropper.prototype.resetResizer = function() {
   resizerDom.style.top = (cropperRect.height - 100) / 2 + 'px';
 
   resizer.doOnStateChange();
+  resizer.doOnDragEnd();
 };
 
 Cropper.prototype.setImage = function(src) {
@@ -181,6 +182,26 @@ Cropper.prototype.render = function(container) {
     image.style.top = -top + 'px';
 
     self.updatePreview();
+  };
+
+  resizer.doOnDragEnd = function() {
+    var left = parseInt(resizerDom.style.left, 10) || 0;
+    var top = parseInt(resizerDom.style.top, 10) || 0;
+    var resizerWidth = resizerDom.offsetWidth;
+    var resizerHeight = resizerDom.offsetHeight;
+
+    var imageSize = self.imageSize;
+    var cropperRect = self.cropperRect;
+    var scale = cropperRect.width / imageSize.width;
+
+    self.croppedRect = {
+      width: Math.floor(resizerWidth / scale),
+      height: Math.floor(resizerHeight / scale),
+      left: Math.floor(left / scale),
+      top: Math.floor(top / scale)
+    };
+
+    self.onCroppedRectChange && self.onCroppedRectChange(self.croppedRect);
   };
   self.resizer = resizer;
   self.dom = dom;

@@ -87,6 +87,9 @@ Resizer.prototype.makeDraggable = function(dom) {
     },
     end: function () {
       dragState = {};
+      if (self.doOnDragEnd) {
+        self.doOnDragEnd();
+      }
     }
   });
 };
@@ -237,6 +240,9 @@ Resizer.prototype.bindResizeEvent = function(dom) {
         self.doOnStateChange();
       },
       end: function () {
+        if (self.doOnDragEnd) {
+          self.doOnDragEnd();
+        }
       }
     });
   };

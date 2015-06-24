@@ -88,6 +88,9 @@ Resizer.prototype.makeDraggable = function(dom) {
     },
     end: function () {
       dragState = {};
+      if (self.doOnDragEnd) {
+        self.doOnDragEnd();
+      }
     }
   });
 };
@@ -238,6 +241,9 @@ Resizer.prototype.bindResizeEvent = function(dom) {
         self.doOnStateChange();
       },
       end: function () {
+        if (self.doOnDragEnd) {
+          self.doOnDragEnd();
+        }
       }
     });
   };
@@ -401,6 +407,7 @@ Cropper.prototype.resetResizer = function() {
   resizerDom.style.top = (cropperRect.height - 100) / 2 + 'px';
 
   resizer.doOnStateChange();
+  resizer.doOnDragEnd();
 };
 
 Cropper.prototype.setImage = function(src) {
@@ -510,6 +517,26 @@ Cropper.prototype.render = function(container) {
 
     self.updatePreview();
   };
+
+  resizer.doOnDragEnd = function() {
+    var left = parseInt(resizerDom.style.left, 10) || 0;
+    var top = parseInt(resizerDom.style.top, 10) || 0;
+    var resizerWidth = resizerDom.offsetWidth;
+    var resizerHeight = resizerDom.offsetHeight;
+
+    var imageSize = self.imageSize;
+    var cropperRect = self.cropperRect;
+    var scale = cropperRect.width / imageSize.width;
+
+    self.croppedRect = {
+      width: Math.floor(resizerWidth / scale),
+      height: Math.floor(resizerHeight / scale),
+      left: Math.floor(left / scale),
+      top: Math.floor(top / scale)
+    };
+
+    self.onCroppedRectChange && self.onCroppedRectChange(self.croppedRect);
+  };
   self.resizer = resizer;
   self.dom = dom;
 
@@ -616,17 +643,32 @@ var Resizer = require('./resizer');
 var Cropper = require('./cropper');
 
 if (typeof angular !== 'undefined') {
-  var cropperInstances  = window.cropperInstances = {};
+  var cropperInstances = {};
 
   angular.module('cropper', []).directive('cropper', function() {
     return {
       restrict: 'A',
+      scope: {
+        cropperContext: '='
+      },
       link: function(scope, element, attrs) {
         var id = attrs.cropper;
         if (!id) throw new Error('cropper id is required');
         var cropper = Cropper({ element: element[0] });
 
         cropperInstances[id] = cropper;
+
+        var cropperContext = scope.cropperContext;
+
+        cropper.onCroppedRectChange = function(rect) {
+          if (cropperContext) {
+            cropperContext.left = rect.left;
+            cropperContext.top = rect.top;
+            cropperContext.width = rect.width;
+            cropperContext.height = rect.height;
+          }
+          scope.$apply();
+        };
 
         scope.$on('$destroy', function() {
           cropperInstances[id] = null;

@@ -2,17 +2,32 @@ var Resizer = require('./resizer');
 var Cropper = require('./cropper');
 
 if (typeof angular !== 'undefined') {
-  var cropperInstances  = window.cropperInstances = {};
+  var cropperInstances = {};
 
   angular.module('cropper', []).directive('cropper', function() {
     return {
       restrict: 'A',
+      scope: {
+        cropperContext: '='
+      },
       link: function(scope, element, attrs) {
         var id = attrs.cropper;
         if (!id) throw new Error('cropper id is required');
         var cropper = Cropper({ element: element[0] });
 
         cropperInstances[id] = cropper;
+
+        var cropperContext = scope.cropperContext;
+
+        cropper.onCroppedRectChange = function(rect) {
+          if (cropperContext) {
+            cropperContext.left = rect.left;
+            cropperContext.top = rect.top;
+            cropperContext.width = rect.width;
+            cropperContext.height = rect.height;
+          }
+          scope.$apply();
+        };
 
         scope.$on('$destroy', function() {
           cropperInstances[id] = null;
