@@ -740,12 +740,22 @@ if (typeof angular !== 'undefined') {
         var id = attrs.cropperSource;
         if (!id) throw new Error('cropper id is required');
 
+        var fileValidateRegex = /\.(jpg|png|gif|jpeg)$/i;
+        var fileTypes = attrs.cropperFileTypes;
+
+        if (fileTypes) {
+          var types = fileTypes.split(',');
+          if (types.length > 0) {
+            fileValidateRegex = new RegExp('\.(' + types.join('|') + ')$', 'i');
+          }
+        }
+
         $el.on('change', function () {
           var input = this;
           var cropper = cropperInstances[id];
 
           var fileName = input.value;
-          if (!/\.(jpg|png|gif|jpeg)$/i.test(fileName)) {
+          if (!fileValidateRegex.test(fileName)) {
             cropper.setImage();
             return;
           }
