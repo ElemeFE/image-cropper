@@ -8,7 +8,7 @@ var preLoadElement;
 var ieVersion = Number(document.documentMode);
 
 var getImageSize = function(src, callback) {
-  if (ieVersion) {
+  if (ieVersion < 10) {
     if (!preLoadElement) {
       preLoadElement = document.createElement("div");
       preLoadElement.style.position = "absolute";
