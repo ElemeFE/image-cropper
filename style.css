@@ -73,7 +73,7 @@ code {
   background: #DFF2F7;
   tab-size: 4;
   white-space: pre;
-  word-break: break-word;
+  word-break: break-all;
 }
 
 pre code {
