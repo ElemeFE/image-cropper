@@ -1,0 +1,128 @@
+form {
+  margin-left: 18px;
+}
+
+form > p {
+  padding-top: 22px;
+  line-height: 40px;
+  font-size: 14px;
+  position: relative;
+  color: #666;
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+form > p .btn-upload {
+  width: 120px;
+  padding: 12px 20px;
+  font-size: 14px;
+  border: 1px solid #1e89e0;
+  background-color: transparent;
+  color: #1e89e0;
+  margin-right: 20px;
+}
+
+form > p input {
+  position: absolute;
+  font-size: 480px;
+  top: 22px;
+  left: -30px;
+  height: 42px;
+  width: 150px;
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  cursor: pointer;
+}
+
+form .btn-submit {
+  font-size: 14px;
+  padding: 12px 20px;
+  width: 120px;
+  margin-right: 20px;
+}
+
+.preview-container {
+  overflow: hidden;
+  color: #999;
+  margin-bottom: 20px;
+}
+
+.preview-container .noavatar {
+  background-color: #efeeef;
+}
+
+.preview-container > div {
+  float: left;
+  height: 320px;
+}
+
+.large-wrapper {
+  border-left: 1px solid #eee;
+  padding-left: 30px;
+  margin-right: 30px;
+}
+
+.image-container {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #bbb;
+  margin-bottom: 5px;
+}
+
+.image-container > img {
+  position: absolute;
+}
+
+.image-container.target {
+  width: 320px;
+  height: 320px;
+  margin-right: 30px;
+}
+
+.image-container.target img {
+  width: 320px;
+  height: 320px;
+}
+
+.image-container.large {
+  width: 210px;
+  height: 210px;
+}
+
+.image-container.large img {
+  width: 210px;
+  height: 210px;
+}
+
+.image-container.large .noavatar {
+  background-position: -320px 0;
+}
+
+.image-container.medium {
+  width: 48px;
+  height: 48px;
+}
+
+.image-container.medium img {
+  width: 48px;
+  height: 48px;
+}
+
+.image-container.medium .noavatar {
+  background-position: -324px -210px;
+}
+
+.image-container.small {
+  width: 20px;
+  height: 20px;
+  margin-top: 30px;
+}
+
+.image-container.small img {
+  width: 20px;
+  height: 20px;
+}
+
+.image-container.small .noavatar {
+  background-position: -373px -210px;
+}

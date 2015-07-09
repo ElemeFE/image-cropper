@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Angular Demo</title>
+  <link href="cropper-demo.css" rel="stylesheet" />
+  <link href="../dist/cropper.css" rel="stylesheet"/>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.28/angular.js"></script>
+  <script type="text/javascript" src="../dist/cropper.js"></script>
+</head>
+<body>
+<form method="post" action="#" enctype="multipart/form-data" ng-app="cropperDemo">
+  <p>
+    <button class="btn-upload btn-lg">Select</button>
+    <input type="file" name="avatar" cropper-source="avatar" cropper-file-types="jpg,jpeg,png" />
+    Support formats: JPG, PNG
+  </p>
+  <div class="preview-container">
+    <div class="image-container target" cropper="avatar" cropper-context="cropContext">
+      <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="noavatar" />
+    </div>
+    <div class="large-wrapper">
+      <div class="image-container large" cropper-preview="avatar">
+        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="noavatar" />
+      </div>
+      <p>Large</p>
+    </div>
+    <div>
+      <div class="image-container medium" cropper-preview="avatar">
+        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="noavatar" />
+      </div>
+      <p>Medium</p>
+      <div class="image-container small" cropper-preview="avatar">
+        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="noavatar" />
+      </div>
+      <p>Small</p>
+    </div>
+  </div>
+
+  <input type="hidden" name="x" value="{{cropContext.left}}"/>
+  <input type="hidden" name="y" value="{{cropContext.top}}"/>
+  <input type="hidden" name="w" value="{{cropContext.width}}"/>
+  <input type="hidden" name="h" value="{{cropContext.height}}"/>
+</form>
+<script>
+  angular.module('cropperDemo', ['cropper'])
+    .controller('demoController', function ($scope) {
+      $scope.cropContext = {};
+    });
+</script>
+</body>
+</html>
