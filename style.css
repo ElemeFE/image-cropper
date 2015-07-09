@@ -7,6 +7,7 @@
   background: rgba(255, 255, 255, .9);
   box-shadow: 0 0 15px 3px rgba(0, 0, 0, .05);
   padding-top: 10px;
+  z-index: 1000;
 }
 
 #logo {
@@ -54,7 +55,7 @@ body {
 }
 
 p {
-  padding: 15px 0;
+  padding: 10px 0;
   line-height: 1.5em;
 }
 
@@ -64,6 +65,16 @@ p, li {
 
 li {
   padding: 5px 0;
+}
+
+h4 {
+  font-size: 1.4em;
+  margin-bottom: 1em;
+}
+
+h5 {
+  font-size: 1.1em;
+  margin: 15px;
 }
 
 code {
