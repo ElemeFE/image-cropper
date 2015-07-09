@@ -1,4 +1,19 @@
 {
+  "name": "image-cropper.js",
+  "version": "0.2.0",
+  "description": "A image cropper for cropping user avatar, no dependencies",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ElemeFE/image-cropper.git"
+  },
+  "keywords": [
+    "crop",
+    "cropper",
+    "image"
+  ],
+  "main": "src/index.js",
+  "author": "long.zhang",
+  "license": "MIT",
   "devDependencies": {
     "browserify": "^9.0.8"
   }

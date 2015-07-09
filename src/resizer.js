@@ -70,8 +70,6 @@ Resizer.prototype.makeDraggable = function(dom) {
         top = containment.top;
       }
 
-      //console.log(offsetLeft, offsetTop);
-
       if (left + dragState.resizerStartWidth > containment.right) {
         left = containment.right - dragState.resizerStartWidth;
       }
@@ -124,8 +122,6 @@ Resizer.prototype.bindResizeEvent = function(dom) {
         var position = getPosition(dom);
         resizeState.resizerStartLeft = position.left;
         resizeState.resizerStartTop = position.top;
-
-        //console.log(resizeState);
       },
       drag: function (event) {
         var widthRatio = transformMap.width;
@@ -161,7 +157,6 @@ Resizer.prototype.bindResizeEvent = function(dom) {
         }
 
         if (aspectRatio !== undefined) {
-          //width = height = Math.max(width, height);
           if (type === 'ord-n' || type === 'ord-s') {
             width = height * aspectRatio;
           } else if (type === 'ord-w' || type === 'ord-e') {

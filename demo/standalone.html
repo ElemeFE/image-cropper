@@ -15,7 +15,7 @@
     Support formats: JPG, PNG
   </p>
   <div class="preview-container">
-    <div class="image-container source" id="cropper-target">
+    <div class="image-container target" id="cropper-target">
       <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="noavatar" />
     </div>
     <div class="large-wrapper">
@@ -42,9 +42,8 @@
   <input type="hidden" name="h" value="{{cropContext.height}}"/>
 </form>
 <script>
-  var target = document.getElementById('cropper-target');
   var cropper = new Cropper({
-    element: target,
+    element: document.getElementById('cropper-target'),
     previews: [
       document.getElementById('preview-large'),
       document.getElementById('preview-medium'),

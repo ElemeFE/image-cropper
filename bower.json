@@ -1,9 +1,9 @@
 {
   "name": "image-cropper",
   "main": "dist/cropper.js",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "authors": [
-    "Furybean <long.zhang@ele.me>"
+    "long.zhang <long.zhang@ele.me>"
   ],
   "license": "MIT",
   "ignore": [

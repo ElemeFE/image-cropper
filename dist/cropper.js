@@ -71,8 +71,6 @@ Resizer.prototype.makeDraggable = function(dom) {
         top = containment.top;
       }
 
-      //console.log(offsetLeft, offsetTop);
-
       if (left + dragState.resizerStartWidth > containment.right) {
         left = containment.right - dragState.resizerStartWidth;
       }
@@ -125,8 +123,6 @@ Resizer.prototype.bindResizeEvent = function(dom) {
         var position = getPosition(dom);
         resizeState.resizerStartLeft = position.left;
         resizeState.resizerStartTop = position.top;
-
-        //console.log(resizeState);
       },
       drag: function (event) {
         var widthRatio = transformMap.width;
@@ -162,7 +158,6 @@ Resizer.prototype.bindResizeEvent = function(dom) {
         }
 
         if (aspectRatio !== undefined) {
-          //width = height = Math.max(width, height);
           if (type === 'ord-n' || type === 'ord-s') {
             width = height * aspectRatio;
           } else if (type === 'ord-w' || type === 'ord-e') {
@@ -481,15 +476,12 @@ Cropper.prototype.setImage = function(src) {
 
     for (var style in cropperRect) {
       if (cropperRect.hasOwnProperty(style)) {
-        dom.style[style] = cropperRect[style] + 'px';
-        sourceImage.style[style] = cropperRect[style] + 'px';
-        resizeImage.style[style] = cropperRect[style] + 'px';
+        dom.style[style] = sourceImage.style[style] = resizeImage.style[style] = cropperRect[style] + 'px';
       }
     }
 
     if (!ieVersion || ieVersion > 9) {
-      sourceImage.src = src;
-      resizeImage.src = src;
+      resizeImage.src = sourceImage.src = src;
     }
 
     self.dom.style.display = '';
@@ -642,13 +634,30 @@ var unbind = function(element, event, fn) {
 
 var isDragging = false;
 
+var isIE8 = Number(document.documentMode) < 9;
+
+var fixEvent = function(event) {
+  var scrollTop = Math.max(window.scrollY || 0, document.documentElement.scrollTop || 0);
+  var scrollLeft = Math.max(window.scrollX || 0, document.documentElement.scrollLeft || 0);
+
+  event.target = event.srcElement;
+  event.pageX = scrollLeft + event.clientX;
+  event.pageY = scrollTop + event.clientY;
+};
+
 module.exports = function(element, options) {
   var moveFn = function(event) {
+    if (isIE8) {
+      fixEvent(event);
+    }
     if (options.drag) {
       options.drag(event);
     }
   };
   var upFn = function(event) {
+    if (isIE8) {
+      fixEvent(event);
+    }
     unbind(document, 'mousemove', moveFn);
     unbind(document, 'mouseup', upFn);
     document.onselectstart = null;
@@ -661,6 +670,9 @@ module.exports = function(element, options) {
     }
   };
   bind(element, 'mousedown', function(event) {
+    if (isIE8) {
+      fixEvent(event);
+    }
     if (isDragging) return;
     document.onselectstart = function() { return false; };
     document.ondragstart = function() { return false; };
@@ -779,12 +791,11 @@ if (typeof angular !== 'undefined') {
       }
     };
   });
-}
-
-if (typeof module !== 'undefined') {
-  module.exports = Cropper;
 } else {
   window.Cropper = Cropper;
 }
+
+module.exports = Cropper;
+
 
 },{"./cropper":3}]},{},[5]);

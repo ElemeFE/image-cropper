@@ -147,15 +147,12 @@ Cropper.prototype.setImage = function(src) {
 
     for (var style in cropperRect) {
       if (cropperRect.hasOwnProperty(style)) {
-        dom.style[style] = cropperRect[style] + 'px';
-        sourceImage.style[style] = cropperRect[style] + 'px';
-        resizeImage.style[style] = cropperRect[style] + 'px';
+        dom.style[style] = sourceImage.style[style] = resizeImage.style[style] = cropperRect[style] + 'px';
       }
     }
 
     if (!ieVersion || ieVersion > 9) {
-      sourceImage.src = src;
-      resizeImage.src = src;
+      resizeImage.src = sourceImage.src = src;
     }
 
     self.dom.style.display = '';

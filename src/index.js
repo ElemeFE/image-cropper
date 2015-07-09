@@ -102,10 +102,9 @@ if (typeof angular !== 'undefined') {
       }
     };
   });
-}
-
-if (typeof module !== 'undefined') {
-  module.exports = Cropper;
 } else {
   window.Cropper = Cropper;
 }
+
+module.exports = Cropper;
+
