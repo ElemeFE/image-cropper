@@ -1,1 +1,128 @@
-My Page
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div id="nav">
+  <a href="/" id="logo">Image Cropper</a>
+  <a href="#install">Install</a>
+  <a href="#guide">Guide</a>
+  <a href="#demo">Demo</a>
+  <a href="https://github.com/elemefe/image-cropper">Github</a>
+</div>
+<div id="main">
+  <h1 id="install">安装</h1>
+
+  <p>使用bower：</p>
+
+<pre><code>&quot;image-cropper&quot;: &quot;git@github.com:ElemeFE/image-cropper.git#~0.1.5&quot;
+</code></pre>
+
+  <p>使用npm：</p>
+
+<pre><code>npm install image-cropper.js --save
+</code></pre>
+
+  <h2 id="">引入文件</h2>
+
+  <p>Image Cropper的使用依赖两个文件：</p>
+
+  <ul>
+    <li>dist/cropper.css</li>
+    <li>dist/cropper.js</li>
+  </ul>
+
+  <p>最简单的办法是直接在HTML中引用这两个文件，不过每个项目的情况不同，可以根据自己的项目情况来决定如何引入这两个文件。 </p>
+  <h1 id="guide">使用说明</h1>
+
+  <p>Image Cropper是因为一个裁剪头像并上传的需求诞生的。</p>
+
+  <p>一个裁剪头像的流程大概是这样：</p>
+
+  <ul>
+    <li>用户选择一张本地图片。</li>
+    <li>用户使用鼠标拖拽裁剪头像，并实时预览不同大小的裁剪效果。</li>
+    <li>把用户的裁剪范围和图片提交到服务器端。</li>
+  </ul>
+
+  <p>从提交到服务器端的角度来看，我们关注的点只有两个：</p>
+
+  <ul>
+    <li>用户选择的图片(File)</li>
+    <li>用户的裁剪结果(Rect: left、top、width、height)</li>
+  </ul>
+
+  <h2 id="angular">在Angular中使用</h2>
+
+  <p>Image Cropper为Angular提供了三个Directive，通过这三个Directive的配合，即可实现一个图像裁剪和预览的效果。</p>
+
+  <ul>
+    <li>cropper: 添加到要显示裁剪框的元素上</li>
+    <li>cropper-source: 添加到input type=file上。</li>
+    <li>cropper-preview: 添加到要显示裁剪预览的元素上。</li>
+    <li>cropper-context：用户的裁剪结果。</li>
+  </ul>
+
+  <p>Image Cropper在同一个页面上可以指定多个Instance，该属性定义一个字符串，作为Image Cropper的一个实例的id。</p>
+
+  <h3 id="cropper">cropper</h3>
+
+  <p>这个Directive，添加到要显示裁剪框的元素上。
+    显示裁剪框的元素应该是这样：</p>
+
+<pre><code>&lt;div class=&quot;image-container source&quot; cropper=&quot;avatar&quot; cropper-context=&quot;cropContext&quot;&gt;
+  &lt;img src=&quot;data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7&quot; class=&quot;noavatar&quot;
+  /&gt;
+  &lt;/div&gt;
+</code></pre>
+
+  <h3 id="cropper-source">cropper-source</h3>
+
+  <p>这个Directive需要绑定在一个input上，在定义的时候需要定义Cropper ID。</p>
+
+<pre><code>&lt;input type=&quot;file&quot; name=&quot;avatar&quot; cropper-source=&quot;avatar&quot; /&gt;
+</code></pre>
+
+  <h4 id="cropper-file-types">cropper-file-types</h4>
+
+  <p>默认支持的类型为gif、png、jpg，如果需要定义只支持某一种或者某几种格式，比如只支持jpg、png，可以这么定义：</p>
+
+<pre><code>&lt;input type=&quot;file&quot; name=&quot;avatar&quot; cropper-source=&quot;avatar&quot; cropper-file-types=&quot;jpg,jpeg,png&quot;
+  /&gt;
+</code></pre>
+
+  <h3 id="cropper-preview">cropper-preview</h3>
+
+  <p>在用户裁剪图像的过程中，需要动态的预览不同大小的头像的效果，需要在预览图像的Container上添加这个directive。</p>
+
+<pre><code>&lt;div class=&quot;image-container small&quot; cropper-preview=&quot;avatar&quot;&gt;
+  &lt;img src=&quot;data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7&quot; class=&quot;noavatar&quot;
+  /&gt;
+  &lt;/div&gt;
+</code></pre>
+
+  <h2 id="demo">独立使用</h2>
+
+  <p>如果要脱离Angular独立使用Image Cropper。</p>
+
+<pre><code>var cropper = new Cropper({
+  element: document.getElementById('demo'),
+  previews: [ document.getElementById('preview-large') ],
+  onCroppedRectChange: function(rect) {
+  //write your logic
+  }
+  });
+
+  cropper.setImage('avatar-big.jpg');
+</code></pre>
+
+  <h1 id="license">License</h1>
+
+  <p>MIT</p>
+</div>
+<footer>Eleme FE © 2015</footer>
+</body>
+</html>
