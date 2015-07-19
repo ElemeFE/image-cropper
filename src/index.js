@@ -15,12 +15,23 @@ if (typeof angular !== 'undefined') {
     return {
       restrict: 'A',
       scope: {
-        cropperContext: '='
+        cropperContext: '=',
+        cropperAspectRatio: '@'
       },
       link: function(scope, element, attrs) {
         var id = attrs.cropper;
         if (!id) throw new Error('cropper id is required');
-        var cropper = Cropper({ element: element[0] });
+        var cropperAspectRatio = scope.cropperAspectRatio;
+
+        if (cropperAspectRatio) {
+          if (/^\d*(\.)?\d+$/g.test(cropperAspectRatio)) {
+            cropperAspectRatio = parseFloat(cropperAspectRatio);
+          }
+        } else {
+          cropperAspectRatio = 1;
+        }
+
+        var cropper = Cropper({ element: element[0], aspectRatio: cropperAspectRatio });
 
         cropperInstances[id] = cropper;
 

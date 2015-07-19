@@ -69,7 +69,16 @@ form .btn-submit {
   margin-bottom: 5px;
 }
 
-.image-container > img {
+.image-container .image-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+}
+
+.image-container img {
   position: absolute;
 }
 

@@ -32,5 +32,4 @@ node_modules
 demo/**/*.bundle.js
 
 # Prototype File
-doc
 prototype
