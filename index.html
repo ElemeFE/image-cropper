@@ -96,7 +96,18 @@
 <pre><code>&lt;div class=&quot;image-container target&quot; cropper=&quot;avatar&quot;&gt;
   &lt;img src=&quot;data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7&quot; class=&quot;noavatar&quot; /&gt;
 &lt;/div&gt;
-</code></pre><h5 id="cropper-context">cropper-context</h5>
+</code></pre>
+<h5 id="cropper-aspect-ratio">cropper-aspect-ratio</h5>
+
+<p>cropper默认的款高比为1，如果需要使用其他宽高比或者不限制宽高比，则可以设置此属性。比如不限制宽高比，则可以这么设置：</p>
+
+<pre><code>&lt;div class=&quot;image-container target&quot; cropper=&quot;avatar&quot; cropper-aspect-ratio=&quot;auto&quot;&gt;
+  &lt;img src=&quot;data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7&quot; class=&quot;noavatar&quot; /&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>cropper-aspect-ratio如果不是数字，则为不限制宽高比。</p>
+<h5 id="cropper-context">cropper-context</h5>
 <p>用户的裁剪结果需要导出到Controller中的一个变量里面，我们可以使用cropper-context来指定这个变量，比如Controller中的变量名是cropContext，则这么定义：</p>
 <pre><code>&lt;div class=&quot;image-container source&quot; cropper=&quot;avatar&quot; cropper-context=&quot;cropContext&quot;&gt;
   &lt;img src=&quot;data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7&quot; class=&quot;noavatar&quot; /&gt;
@@ -111,14 +122,23 @@
 </code></pre><h4 id="cropper-preview">cropper-preview</h4>
 <p>在用户裁剪图像的过程中，需要动态的预览不同大小的头像的效果，在显示预览图像的元素上添加这个directive。这个directive的属性值为Image Cropper的实例的ID，例如：</p>
 <pre><code>&lt;div class=&quot;image-container small&quot; cropper-preview=&quot;avatar&quot;&gt;
-    &lt;img src=&quot;data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7&quot; class=&quot;noavatar&quot; /&gt;
+  &lt;img src=&quot;data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7&quot; class=&quot;noavatar&quot; /&gt;
 &lt;/div&gt;
-</code></pre><h3 id="-">独立使用</h3>
+</code></pre>
+<p>注意，如果设置了aspectRatio为非数值，即不限制裁剪图片的宽高比，cropper-preview的HTML应该是这种结构的：</p>
+<pre><code>&lt;div class=&quot;image-container small&quot; id=&quot;preview-small&quot;&gt;
+  &lt;div class=&quot;image-wrapper&quot;&gt;
+    &lt;img src=&quot;data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7&quot; class=&quot;noavatar&quot; /&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+<h3 id="-">独立使用</h3>
 <p>Image Cropper是可以不和Angular集成，独立使用的。如果你的页面中没有Angular，则在window上可以直接使用Cropper。</p>
 <h4 id="-cropper-">创建Cropper实例</h4>
 <p>独立使用Cropper，需要指定这么几个属性：</p>
 <ul>
 <li>element：显示裁剪框的Element。</li>
+<li>aspectRatio：裁剪框的宽高比，默认值为1。如果设置非数字类型，则为不限制款高比。</li>
 <li>previews：数组类型，可以指定多个显示图片预览的元素。 </li>
 <li>onCroppedRectChange：在裁剪结果变更之后会触发这个回调。</li>
 </ul>
