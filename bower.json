@@ -1,7 +1,7 @@
 {
   "name": "image-cropper",
   "main": "dist/cropper.js",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "authors": [
     "long.zhang <long.zhang@ele.me>"
   ],

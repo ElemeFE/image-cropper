@@ -298,7 +298,122 @@ Resizer.prototype.render = function(container) {
 };
 
 module.exports = Resizer;
-},{"./build-dom":2,"./draggable":4}],2:[function(require,module,exports){
+},{"./build-dom":3,"./draggable":5}],2:[function(require,module,exports){
+var Cropper = require('./cropper');
+
+var cropperInstances = {};
+
+Cropper.getInstance = function(id) {
+  return cropperInstances[id];
+};
+
+angular.module('cropper', [])
+.factory('Cropper', function() {
+  return Cropper;
+})
+.directive('cropper', function() {
+  return {
+    restrict: 'A',
+    scope: {
+      cropperContext: '=',
+      cropperAspectRatio: '@'
+    },
+    link: function(scope, element, attrs) {
+      var id = attrs.cropper;
+      if (!id) throw new Error('cropper id is required');
+      var cropperAspectRatio = scope.cropperAspectRatio;
+
+      if (cropperAspectRatio) {
+        if (/^\d*(\.)?\d+$/g.test(cropperAspectRatio)) {
+          cropperAspectRatio = parseFloat(cropperAspectRatio);
+        }
+      } else {
+        cropperAspectRatio = 1;
+      }
+
+      var cropper = Cropper({ element: element[0], aspectRatio: cropperAspectRatio });
+
+      cropperInstances[id] = cropper;
+
+      var cropperContext = scope.cropperContext;
+
+      cropper.onCroppedRectChange = function(rect) {
+        if (cropperContext) {
+          cropperContext.left = rect.left;
+          cropperContext.top = rect.top;
+          cropperContext.width = rect.width;
+          cropperContext.height = rect.height;
+        }
+        try { scope.$apply(); } catch(e) {}
+      };
+
+      scope.$on('$destroy', function() {
+        cropperInstances[id] = null;
+        delete cropperInstances[id];
+      });
+    }
+  };
+}).directive('cropperPreview', function(){
+  return {
+    restrict: 'A',
+    link: function(scope, element, attrs) {
+      var id = attrs.cropperPreview;
+      if (!id) throw new Error('cropper id is required');
+
+      var cropper = cropperInstances[id];
+
+      if (cropper) {
+        cropper.addPreview(element[0]);
+      }
+    }
+  }
+}).directive('cropperSource', function() {
+  return {
+    restrict: 'A',
+    link: function ($scope, $el, attrs) {
+      var id = attrs.cropperSource;
+      if (!id) throw new Error('cropper id is required');
+
+      var fileValidateRegex = /\.(jpg|png|gif|jpeg)$/i;
+      var fileTypes = attrs.cropperFileTypes;
+
+      if (fileTypes) {
+        var types = fileTypes.split(',');
+        if (types.length > 0) {
+          fileValidateRegex = new RegExp('\.(' + types.join('|') + ')$', 'i');
+        }
+      }
+
+      $el.on('change', function () {
+        var input = this;
+        var cropper = cropperInstances[id];
+
+        var fileName = input.value;
+        if (!fileValidateRegex.test(fileName)) {
+          cropper.setImage();
+          return;
+        }
+
+        if (typeof FileReader !== 'undefined') {
+          var reader = new FileReader();
+          reader.onload = function (event) {
+            cropper.setImage(event.target.result);
+          };
+          if (input.files && input.files[0]) {
+            reader.readAsDataURL(input.files[0]);
+          }
+        } else {
+          input.select();
+          input.blur();
+
+          var src = document.selection.createRange().text;
+          cropper.setImage(src);
+        }
+      });
+    }
+  };
+});
+},{"./cropper":4}],3:[function(require,module,exports){
 var buildDOM = function(config, refs) {
   if (!config) return null;
   var dom, childElement;
@@ -332,7 +447,7 @@ var buildDOM = function(config, refs) {
 };
 
 module.exports = buildDOM;
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var Resizer = require('./Resizer');
 var buildDom = require('./build-dom');
 
@@ -656,7 +771,7 @@ Cropper.prototype.updatePreview = function(src) {
 };
 
 module.exports = Cropper;
-},{"./Resizer":1,"./build-dom":2}],4:[function(require,module,exports){
+},{"./Resizer":1,"./build-dom":3}],5:[function(require,module,exports){
 var bind = function(element, event, fn) {
   if (element.attachEvent) {
     element.attachEvent('on' + event, fn);
@@ -727,127 +842,14 @@ module.exports = function(element, options) {
     }
   });
 };
-},{}],5:[function(require,module,exports){
-var Cropper = require('./cropper');
-
+},{}],6:[function(require,module,exports){
+window.Cropper = require('./cropper');
+},{"./cropper":4}],7:[function(require,module,exports){
 if (typeof angular !== 'undefined') {
-  var cropperInstances = {};
-
-  Cropper.getInstance = function(id) {
-    return cropperInstances[id];
-  };
-
-  angular.module('cropper', [])
-  .factory('Cropper', function() {
-    return Cropper;
-  })
-  .directive('cropper', function() {
-    return {
-      restrict: 'A',
-      scope: {
-        cropperContext: '=',
-        cropperAspectRatio: '@'
-      },
-      link: function(scope, element, attrs) {
-        var id = attrs.cropper;
-        if (!id) throw new Error('cropper id is required');
-        var cropperAspectRatio = scope.cropperAspectRatio;
-
-        if (cropperAspectRatio) {
-          if (/^\d*(\.)?\d+$/g.test(cropperAspectRatio)) {
-            cropperAspectRatio = parseFloat(cropperAspectRatio);
-          }
-        } else {
-          cropperAspectRatio = 1;
-        }
-
-        var cropper = Cropper({ element: element[0], aspectRatio: cropperAspectRatio });
-
-        cropperInstances[id] = cropper;
-
-        var cropperContext = scope.cropperContext;
-
-        cropper.onCroppedRectChange = function(rect) {
-          if (cropperContext) {
-            cropperContext.left = rect.left;
-            cropperContext.top = rect.top;
-            cropperContext.width = rect.width;
-            cropperContext.height = rect.height;
-          }
-          try { scope.$apply(); } catch(e) {}
-        };
-
-        scope.$on('$destroy', function() {
-          cropperInstances[id] = null;
-          delete cropperInstances[id];
-        });
-      }
-    };
-  }).directive('cropperPreview', function(){
-    return {
-      restrict: 'A',
-      link: function(scope, element, attrs) {
-        var id = attrs.cropperPreview;
-        if (!id) throw new Error('cropper id is required');
-
-        var cropper = cropperInstances[id];
-
-        if (cropper) {
-          cropper.addPreview(element[0]);
-        }
-      }
-    }
-  }).directive('cropperSource', function() {
-    return {
-      restrict: 'A',
-      link: function ($scope, $el, attrs) {
-        var id = attrs.cropperSource;
-        if (!id) throw new Error('cropper id is required');
-
-        var fileValidateRegex = /\.(jpg|png|gif|jpeg)$/i;
-        var fileTypes = attrs.cropperFileTypes;
-
-        if (fileTypes) {
-          var types = fileTypes.split(',');
-          if (types.length > 0) {
-            fileValidateRegex = new RegExp('\.(' + types.join('|') + ')$', 'i');
-          }
-        }
-
-        $el.on('change', function () {
-          var input = this;
-          var cropper = cropperInstances[id];
-
-          var fileName = input.value;
-          if (!fileValidateRegex.test(fileName)) {
-            cropper.setImage();
-            return;
-          }
-
-          if (typeof FileReader !== 'undefined') {
-            var reader = new FileReader();
-            reader.onload = function (event) {
-              cropper.setImage(event.target.result);
-            };
-            if (input.files && input.files[0]) {
-              reader.readAsDataURL(input.files[0]);
-            }
-          } else {
-            input.select();
-            input.blur();
-
-            var src = document.selection.createRange().text;
-            cropper.setImage(src);
-          }
-        });
-      }
-    };
-  });
+  require('./angular');
 } else {
-  window.Cropper = Cropper;
+  require('./export');
 }
 
-module.exports = Cropper;
 
-
-},{"./cropper":3}]},{},[5]);
+},{"./angular":2,"./export":6}]},{},[7]);
