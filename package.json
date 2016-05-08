@@ -1,6 +1,6 @@
 {
   "name": "image-cropper.js",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "A image cropper for cropping user avatar, no dependencies",
   "repository": {
     "type": "git",
@@ -15,6 +15,12 @@
   "author": "long.zhang",
   "license": "MIT",
   "devDependencies": {
-    "browserify": "^9.0.8"
+    "browserify": "^9.0.8",
+    "watchify": "^3.3.0"
+  },
+  "scripts": {
+    "build": "browserify src/index.js -o dist/cropper.js",
+    "watch": "watchify src/index.js -o dist/cropper.js -dv",
+    "build-plain": "browserify src/export.js -o dist/cropper-plain.js"
   }
 }

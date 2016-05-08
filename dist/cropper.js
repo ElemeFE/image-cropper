@@ -23,7 +23,10 @@ var getPosition = function (element) {
   };
 };
 
-var Resizer = function() {
+var Resizer = function(options) {
+  for (var prop in options) {
+    if (options.hasOwnProperty(prop)) this[prop] = options[prop];
+  }
 };
 
 Resizer.prototype.doOnStateChange = function(state) {
@@ -96,6 +99,11 @@ Resizer.prototype.makeDraggable = function(dom) {
 Resizer.prototype.bindResizeEvent = function(dom) {
   var self = this;
   var resizeState = {};
+  var aspectRatio = self.aspectRatio;
+
+  if (typeof aspectRatio !== 'number') {
+    aspectRatio = undefined;
+  }
 
   var makeResizable = function (bar) {
     var type = bar.className.split(' ')[0];
@@ -127,8 +135,6 @@ Resizer.prototype.bindResizeEvent = function(dom) {
       drag: function (event) {
         var widthRatio = transformMap.width;
         var heightRatio = transformMap.height;
-
-        var aspectRatio = 1;
 
         var offsetLeft = event.clientX - resizeState.startLeft;
         var offsetTop = event.clientY - resizeState.startTop;
@@ -292,7 +298,122 @@ Resizer.prototype.render = function(container) {
 };
 
 module.exports = Resizer;
-},{"./build-dom":2,"./draggable":4}],2:[function(require,module,exports){
+},{"./build-dom":3,"./draggable":5}],2:[function(require,module,exports){
+var Cropper = require('./cropper');
+
+var cropperInstances = {};
+
+Cropper.getInstance = function(id) {
+  return cropperInstances[id];
+};
+
+angular.module('cropper', [])
+.factory('Cropper', function() {
+  return Cropper;
+})
+.directive('cropper', function() {
+  return {
+    restrict: 'A',
+    scope: {
+      cropperContext: '=',
+      cropperAspectRatio: '@'
+    },
+    link: function(scope, element, attrs) {
+      var id = attrs.cropper;
+      if (!id) throw new Error('cropper id is required');
+      var cropperAspectRatio = scope.cropperAspectRatio;
+
+      if (cropperAspectRatio) {
+        if (/^\d*(\.)?\d+$/g.test(cropperAspectRatio)) {
+          cropperAspectRatio = parseFloat(cropperAspectRatio);
+        }
+      } else {
+        cropperAspectRatio = 1;
+      }
+
+      var cropper = Cropper({ element: element[0], aspectRatio: cropperAspectRatio });
+
+      cropperInstances[id] = cropper;
+
+      var cropperContext = scope.cropperContext;
+
+      cropper.onCroppedRectChange = function(rect) {
+        if (cropperContext) {
+          cropperContext.left = rect.left;
+          cropperContext.top = rect.top;
+          cropperContext.width = rect.width;
+          cropperContext.height = rect.height;
+        }
+        try { scope.$apply(); } catch(e) {}
+      };
+
+      scope.$on('$destroy', function() {
+        cropperInstances[id] = null;
+        delete cropperInstances[id];
+      });
+    }
+  };
+}).directive('cropperPreview', function(){
+  return {
+    restrict: 'A',
+    link: function(scope, element, attrs) {
+      var id = attrs.cropperPreview;
+      if (!id) throw new Error('cropper id is required');
+
+      var cropper = cropperInstances[id];
+
+      if (cropper) {
+        cropper.addPreview(element[0]);
+      }
+    }
+  }
+}).directive('cropperSource', function() {
+  return {
+    restrict: 'A',
+    link: function ($scope, $el, attrs) {
+      var id = attrs.cropperSource;
+      if (!id) throw new Error('cropper id is required');
+
+      var fileValidateRegex = /\.(jpg|png|gif|jpeg)$/i;
+      var fileTypes = attrs.cropperFileTypes;
+
+      if (fileTypes) {
+        var types = fileTypes.split(',');
+        if (types.length > 0) {
+          fileValidateRegex = new RegExp('\.(' + types.join('|') + ')$', 'i');
+        }
+      }
+
+      $el.on('change', function () {
+        var input = this;
+        var cropper = cropperInstances[id];
+
+        var fileName = input.value;
+        if (!fileValidateRegex.test(fileName)) {
+          cropper.setImage();
+          return;
+        }
+
+        if (typeof FileReader !== 'undefined') {
+          var reader = new FileReader();
+          reader.onload = function (event) {
+            cropper.setImage(event.target.result);
+          };
+          if (input.files && input.files[0]) {
+            reader.readAsDataURL(input.files[0]);
+          }
+        } else {
+          input.select();
+          input.blur();
+
+          var src = document.selection.createRange().text;
+          cropper.setImage(src);
+        }
+      });
+    }
+  };
+});
+},{"./cropper":4}],3:[function(require,module,exports){
 var buildDOM = function(config, refs) {
   if (!config) return null;
   var dom, childElement;
@@ -326,7 +447,7 @@ var buildDOM = function(config, refs) {
 };
 
 module.exports = buildDOM;
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var Resizer = require('./Resizer');
 var buildDom = require('./build-dom');
 
@@ -339,17 +460,17 @@ var ieVersion = Number(document.documentMode);
 var getImageSize = function(src, callback) {
   if (ieVersion < 10) {
     if (!preLoadElement) {
-      preLoadElement = document.createElement("div");
-      preLoadElement.style.position = "absolute";
-      preLoadElement.style.width = "1px";
-      preLoadElement.style.height = "1px";
-      preLoadElement.style.left = "-9999px";
-      preLoadElement.style.top = "-9999px";
+      preLoadElement = document.createElement('div');
+      preLoadElement.style.position = 'absolute';
+      preLoadElement.style.width = '1px';
+      preLoadElement.style.height = '1px';
+      preLoadElement.style.left = '-9999px';
+      preLoadElement.style.top = '-9999px';
       preLoadElement.style.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image)';
       document.body.insertBefore(preLoadElement, document.body.firstChild);
     }
 
-    preLoadElement.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = src;
+    preLoadElement.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
 
     var size = {
       width: preLoadElement.offsetWidth,
@@ -379,6 +500,7 @@ var Cropper = function(options) {
   if (!(this instanceof Cropper)) {
     cropper = new Cropper();
   }
+  cropper.aspectRatio = 1;
   for (var prop in options) {
     if (options.hasOwnProperty(prop)) cropper[prop] = options[prop];
   }
@@ -393,14 +515,22 @@ var Cropper = function(options) {
 Cropper.prototype.resetResizer = function() {
   var resizer = this.resizer;
   var cropperRect = this.cropperRect;
+  var aspectRatio = this.aspectRatio;
+
+  if (typeof aspectRatio !== 'number') {
+    aspectRatio = 1;
+  }
+
+  var width = 100;
+  var height = 100 / aspectRatio;
 
   var resizerDom = resizer.dom;
-  resizerDom.style.width = '100px';
-  resizerDom.style.height = '100px';
+  resizerDom.style.width = width + 'px';
+  resizerDom.style.height = height + 'px';
 
   if (cropperRect) {
-    resizerDom.style.left = (cropperRect.width - 100) / 2 + 'px';
-    resizerDom.style.top = (cropperRect.height - 100) / 2 + 'px';
+    resizerDom.style.left = (cropperRect.width - width) / 2 + 'px';
+    resizerDom.style.top = (cropperRect.height - height) / 2 + 'px';
   } else {
     resizerDom.style.left = resizerDom.style.top = '';
   }
@@ -447,8 +577,8 @@ Cropper.prototype.setImage = function(src) {
       resizeImage.src = sourceImage.src = blankImage;
       resizeImage.style.filter = sourceImage.style.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)';
 
-      sourceImage.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = src;
-      resizeImage.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = src;
+      sourceImage.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
+      resizeImage.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
     }
 
     self.imageSize = size;
@@ -500,7 +630,7 @@ Cropper.prototype.addPreview = function(preview) {
 };
 
 Cropper.prototype.render = function(container) {
-  var resizer = new Resizer();
+  var resizer = new Resizer({ aspectRatio: this.aspectRatio });
   var refs = {};
 
   var dom = buildDom({
@@ -582,40 +712,66 @@ Cropper.prototype.updatePreview = function(src) {
   var resizerTop = parseInt(resizerDom.style.top, 10) || 0;
 
   var resizerWidth = resizerDom.offsetWidth;
+  var resizerHeight = resizerDom.offsetHeight;
 
   for (var i = 0, j = previews.length; i < j; i++) {
-    var item = previews[i];
-    var itemImg = item.querySelector('img');
-    if (!itemImg) continue;
+    var previewElement = previews[i];
+    var previewImage = previewElement.querySelector('img');
+    var previewWrapper = previewElement.querySelector('div');
+
+    if (!previewImage) continue;
 
     if (src === blankImage) {
-      itemImg.style.width = itemImg.style.height = itemImg.style.left = itemImg.style.top = '';
-      itemImg.src = blankImage;
+      previewImage.style.width = previewImage.style.height = previewImage.style.left = previewImage.style.top = '';
+      previewImage.src = blankImage;
     } else {
       if (ieVersion < 10) {
         if (src) {
-          itemImg.src = blankImage;
+          previewImage.src = blankImage;
 
-          itemImg.style.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)';
-          itemImg.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = src;
-          itemImg.style.width = cropperRect.width + 'px';
-          itemImg.style.height = cropperRect.height + 'px';
+          previewImage.style.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)';
+          previewImage.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
+          previewImage.style.width = cropperRect.width + 'px';
+          previewImage.style.height = cropperRect.height + 'px';
         }
       } else if (src) {
-        itemImg.src = src;
+        previewImage.src = src;
       }
-      var scale = item.offsetWidth / resizerWidth;
 
-      itemImg.style.width = scale * cropperRect.width + 'px';
-      itemImg.style.height = scale * cropperRect.height + 'px';
-      itemImg.style.left = -resizerLeft * scale + 'px';
-      itemImg.style.top = -resizerTop * scale + 'px';
+      var elementWidth = previewElement.offsetWidth;
+      var elementHeight = previewElement.offsetHeight;
+
+      var scale = elementWidth / resizerWidth;
+
+      if (previewWrapper) {
+        var elementRatio = elementWidth / elementHeight;
+        var resizerRatio = resizerWidth / resizerHeight;
+
+        if (elementRatio < resizerRatio) {
+          previewWrapper.style.width = elementWidth + 'px';
+          previewWrapper.style.height = resizerHeight * elementWidth / resizerWidth + 'px';
+          previewWrapper.style.top = (elementHeight - previewWrapper.clientHeight) / 2 + 'px';
+          previewWrapper.style.left = '';
+        } else {
+          var visibleWidth = resizerWidth * elementHeight / resizerHeight;
+          scale = visibleWidth / resizerWidth;
+          previewWrapper.style.height = elementHeight + 'px';
+          previewWrapper.style.width = visibleWidth + 'px';
+          previewWrapper.style.left = (elementWidth - previewWrapper.clientWidth) / 2 + 'px';
+          previewWrapper.style.top = '';
+        }
+      }
+
+      previewImage.style.width = scale * cropperRect.width + 'px';
+      previewImage.style.height = scale * cropperRect.height + 'px';
+      previewImage.style.left = -resizerLeft * scale + 'px';
+      previewImage.style.top = -resizerTop * scale + 'px';
     }
   }
 };
 
 module.exports = Cropper;
-},{"./Resizer":1,"./build-dom":2}],4:[function(require,module,exports){
+},{"./Resizer":1,"./build-dom":3}],5:[function(require,module,exports){
 var bind = function(element, event, fn) {
   if (element.attachEvent) {
     element.attachEvent('on' + event, fn);
@@ -686,116 +842,14 @@ module.exports = function(element, options) {
     }
   });
 };
-},{}],5:[function(require,module,exports){
-var Cropper = require('./cropper');
-
+},{}],6:[function(require,module,exports){
+window.Cropper = require('./cropper');
+},{"./cropper":4}],7:[function(require,module,exports){
 if (typeof angular !== 'undefined') {
-  var cropperInstances = {};
-
-  Cropper.getInstance = function(id) {
-    return cropperInstances[id];
-  };
-
-  angular.module('cropper', [])
-  .factory('Cropper', function() {
-    return Cropper;
-  })
-  .directive('cropper', function() {
-    return {
-      restrict: 'A',
-      scope: {
-        cropperContext: '='
-      },
-      link: function(scope, element, attrs) {
-        var id = attrs.cropper;
-        if (!id) throw new Error('cropper id is required');
-        var cropper = Cropper({ element: element[0] });
-
-        cropperInstances[id] = cropper;
-
-        var cropperContext = scope.cropperContext;
-
-        cropper.onCroppedRectChange = function(rect) {
-          if (cropperContext) {
-            cropperContext.left = rect.left;
-            cropperContext.top = rect.top;
-            cropperContext.width = rect.width;
-            cropperContext.height = rect.height;
-          }
-          try { scope.$apply(); } catch(e) {}
-        };
-
-        scope.$on('$destroy', function() {
-          cropperInstances[id] = null;
-          delete cropperInstances[id];
-        });
-      }
-    };
-  }).directive('cropperPreview', function(){
-    return {
-      restrict: 'A',
-      link: function(scope, element, attrs) {
-        var id = attrs.cropperPreview;
-        if (!id) throw new Error('cropper id is required');
-
-        var cropper = cropperInstances[id];
-
-        if (cropper) {
-          cropper.addPreview(element[0]);
-        }
-      }
-    }
-  }).directive('cropperSource', function() {
-    return {
-      restrict: 'A',
-      link: function ($scope, $el, attrs) {
-        var id = attrs.cropperSource;
-        if (!id) throw new Error('cropper id is required');
-
-        var fileValidateRegex = /\.(jpg|png|gif|jpeg)$/i;
-        var fileTypes = attrs.cropperFileTypes;
-
-        if (fileTypes) {
-          var types = fileTypes.split(',');
-          if (types.length > 0) {
-            fileValidateRegex = new RegExp('\.(' + types.join('|') + ')$', 'i');
-          }
-        }
-
-        $el.on('change', function () {
-          var input = this;
-          var cropper = cropperInstances[id];
-
-          var fileName = input.value;
-          if (!fileValidateRegex.test(fileName)) {
-            cropper.setImage();
-            return;
-          }
-
-          if (typeof FileReader !== 'undefined') {
-            var reader = new FileReader();
-            reader.onload = function (event) {
-              cropper.setImage(event.target.result);
-            };
-            if (input.files && input.files[0]) {
-              reader.readAsDataURL(input.files[0]);
-            }
-          } else {
-            input.select();
-            input.blur();
-
-            var src = document.selection.createRange().text;
-            cropper.setImage(src);
-          }
-        });
-      }
-    };
-  });
+  require('./angular');
 } else {
-  window.Cropper = Cropper;
+  require('./export');
 }
 
-module.exports = Cropper;
 
-
-},{"./cropper":3}]},{},[5]);
+},{"./angular":2,"./export":6}]},{},[7]);

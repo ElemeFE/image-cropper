@@ -22,7 +22,10 @@ var getPosition = function (element) {
   };
 };
 
-var Resizer = function() {
+var Resizer = function(options) {
+  for (var prop in options) {
+    if (options.hasOwnProperty(prop)) this[prop] = options[prop];
+  }
 };
 
 Resizer.prototype.doOnStateChange = function(state) {
@@ -95,6 +98,11 @@ Resizer.prototype.makeDraggable = function(dom) {
 Resizer.prototype.bindResizeEvent = function(dom) {
   var self = this;
   var resizeState = {};
+  var aspectRatio = self.aspectRatio;
+
+  if (typeof aspectRatio !== 'number') {
+    aspectRatio = undefined;
+  }
 
   var makeResizable = function (bar) {
     var type = bar.className.split(' ')[0];
@@ -126,8 +134,6 @@ Resizer.prototype.bindResizeEvent = function(dom) {
       drag: function (event) {
         var widthRatio = transformMap.width;
         var heightRatio = transformMap.height;
-
-        var aspectRatio = 1;
 
         var offsetLeft = event.clientX - resizeState.startLeft;
         var offsetTop = event.clientY - resizeState.startTop;
