@@ -1,4 +1,4 @@
-var Resizer = require('./Resizer');
+var Resizer = require('./resizer');
 var buildDom = require('./build-dom');
 
 var blankImage = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
